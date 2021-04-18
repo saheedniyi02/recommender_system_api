@@ -9,7 +9,7 @@ system=np.load("utils/cosine_similarity.npy")
 indices=pd.read_csv("utils/indices.csv")["_id"]
 
 
-def recommend(_id, cosine_sim = 9system):
+def recommend(_id, cosine_sim = system):
     recommended_texts = []
     idx = indices[indices == _id].index[0]
     score_series = pd.Series(cosine_sim[idx]).sort_values(ascending = False)
