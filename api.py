@@ -34,7 +34,7 @@ app=Flask(__name__)
 
 @app.route('/')
 def home():
-    return redirect('https://google.com')
+    return redirect('https://documenter.getpostman.com/view/11853513/TzJsfJSw')
 
 @app.route("/recommendations/<_id>",methods=["GET"])
 def api(_id):
