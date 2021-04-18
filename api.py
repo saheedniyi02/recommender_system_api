@@ -39,9 +39,12 @@ app=Flask(__name__)
 
 @app.route("/recommendations/<_id>",methods=["GET"])
 def api(_id):
-    print(_id)
-    recommendations=get_recommendations(_id)
-    return jsonify({"data":recommendations,"message":f"recommendations successfully gotten for {_id}"})
+    try:
+        recommendations=get_recommendations(_id)
+        return jsonify({"data":recommendations,"message":f"recommendations successfully gotten for {_id}"}),200
+    except :
+        return jsonify({"message":f"recommendations couldn't be gotten for {_id}"}),404
+
 
 
 if __name__ == '__main__':
