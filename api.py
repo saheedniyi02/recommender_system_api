@@ -15,10 +15,7 @@ def recommend(_id, cosine_sim = system):
     ).sort_values(ascending = False)
     top_2_indices = list(score_series.iloc[1:3].index)
 
-
-    return jsonify([
-        list(indices)[i] for i in top_2_indices
-    ])
+    return [list(indices)[i] for i in top_2_indices]
 
 
 
