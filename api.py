@@ -70,7 +70,7 @@ def api(_id):
             "message":f"recommendations couldn't be gotten for id:{_id}"
         }),500
 
-@app.route("/update_recommendations", methods=['GET'])
+@app.route("/update_recommendations", methods=['POST'])
 def update_system():
     load_model()
     return "",204
