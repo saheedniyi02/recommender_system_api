@@ -41,9 +41,9 @@ app=Flask(__name__)
 def api(_id):
     try:
         recommendations=get_recommendations(_id)
-        return jsonify({"data":recommendations,"message":f"recommendations successfully gotten for {_id}"}),200
+        return jsonify({"data":recommendations,"message":f"recommendations successfully gotten for id:{_id}"}),200
     except :
-        return jsonify({"message":f"recommendations couldn't be gotten for {_id}"}),404
+        return jsonify({"message":f"recommendations couldn't be gotten for id:{_id}"}),404
 
 
 
