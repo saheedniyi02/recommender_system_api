@@ -1,17 +1,14 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 #import libraries
-import pymongo
 from pymongo import MongoClient
-import pandas as pd
-#import dns
-import numpy as np
-from sklearn.feature_extraction.text import CountVectorizer,TfidfVectorizer
+from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 from nltk import WordNetLemmatizer
-from nltk.tokenize import word_tokenize
-import nltk
-import time
+import nltk, time, numpy as np, pandas as pd, os
+from dotenv import load_dotenv
+
+load_dotenv()
 
 #download important nltk requirements
 nltk.download("wordnet")
@@ -21,11 +18,8 @@ nltk.download("punkt")
 #important functions and classes
 def load_data(pymongo_link):
     client=MongoClient(pymongo_link)
-    collection=client.upspace.data
-    cursor=collection.find()
-    list_cursor=list(cursor)
-    df=pd.DataFrame(list_cursor)
-    return df
+    list_cursor=list(client.upspace.data.find())
+    return pd.DataFrame(list_cursor)
 
 def clean_authors(list_of_authors):
     new_list=[]
@@ -35,7 +29,7 @@ def clean_authors(list_of_authors):
             author=author.replace(char,"")
         author=author.lower()
         new_list.append(author)
-    return new_list\
+    return new_list
 
 def clean_abstract(abstract):
    special_char=["\n","\r"]
@@ -56,22 +50,18 @@ def clean_text(text):
     return new_text
 
 def test_recommend(title, cosine_sim,indices):
-    recommended_texts = []
     idx = indices[indices == title].index[0]
     score_series = pd.Series(cosine_sim[idx]).sort_values(ascending = False)
     top_2_indices = list(score_series.iloc[1:3].index)
 
-    for i in top_2_indices:
-        recommended_texts.append(list(indices)[i])
-
-    return recommended_texts
+    return [list(indices)[i] for i in top_2_indices]
 
 vect=TfidfVectorizer(stop_words="english")
 
 
 def load_model():
     start=time.time()
-    df=load_data("mongodb+srv://Tabby:1234@cluster0.c2f7n.mongodb.net/test")
+    df=load_data(os.getenv('MONGODB_CONNECTION_STRING'))
     df_uncleaned=df.copy()
     print(f"There are {df.shape[0]} documents in the database")
     df["authors"]=df["authors"].apply(clean_authors)
