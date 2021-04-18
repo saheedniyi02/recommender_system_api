@@ -66,7 +66,7 @@ def load_model():
     print(f"There are {df.shape[0]} documents in the database")
     df["authors"]=df["authors"].apply(clean_authors)
     df["abstract"]=df["abstract"].apply(clean_abstract)
-    df["Text"]=" "+df["title"]+" "+df["abstract"]#+df["authors"].apply(authors_to_string)
+    df["Text"]=""+df["title"]+""+df["abstract"]+df["authors"].apply(lambda authors: " ".join(authors))
     df["Text"]=df["Text"].apply(clean_text)
     vect.fit(df["Text"])
     print(f"There are {len(vect.vocabulary_)} important words in the documents used for recommendation")
