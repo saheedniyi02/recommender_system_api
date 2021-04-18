@@ -3,12 +3,13 @@ from __future__ import unicode_literals
 from flask import Flask,jsonify,json
 import pandas as pd
 import numpy as np
+from build_model import load_model
 
 system=np.load("utils/cosine_similarity.npy")
 indices=pd.read_csv("utils/indices.csv")["_id"]
 
 
-def recommend(_id, cosine_sim = system):
+def recommend(_id, cosine_sim = 9system):
     recommended_texts = []
     idx = indices[indices == _id].index[0]
     score_series = pd.Series(cosine_sim[idx]).sort_values(ascending = False)
@@ -45,7 +46,10 @@ def api(_id):
     except :
         return jsonify({"message":f"recommendations couldn't be gotten for id:{_id}"}),404
 
-
+@app.route("/update_recommendations")
+def update_system():
+    load_model()
+    return "",204
 
 if __name__ == '__main__':
     app.run(debug=False)

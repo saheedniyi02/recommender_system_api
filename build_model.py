@@ -11,13 +11,12 @@ from sklearn.metrics.pairwise import cosine_similarity
 from nltk import WordNetLemmatizer
 from nltk.tokenize import word_tokenize
 import nltk
+import time
 
 #download important nltk requirements
 nltk.download("wordnet")
 nltk.download("punkt")
 
-#index to test
-test_index=5
 
 #important functions and classes
 def load_data(pymongo_link):
@@ -56,11 +55,11 @@ def clean_text(text):
     new_text=" ".join(new_text)
     return new_text
 
-def recommend(title, cosine_sim):
+def test_recommend(title, cosine_sim,indices):
     recommended_texts = []
     idx = indices[indices == title].index[0]
     score_series = pd.Series(cosine_sim[idx]).sort_values(ascending = False)
-    top_10_indices = list(score_series.iloc[1:3].index)
+    top_2_indices = list(score_series.iloc[1:3].index)
 
     for i in top_2_indices:
         recommended_texts.append(list(indices)[i])
@@ -69,7 +68,9 @@ def recommend(title, cosine_sim):
 
 vect=TfidfVectorizer(stop_words="english")
 
-if __name__ == '__main__':
+
+def load_model():
+    start=time.time()
     df=load_data("mongodb+srv://Tabby:1234@cluster0.c2f7n.mongodb.net/test")
     df_uncleaned=df.copy()
     print(f"There are {df.shape[0]} documents in the database")
@@ -78,23 +79,33 @@ if __name__ == '__main__':
     df["Text"]=" "+df["title"]+" "+df["abstract"]#+df["authors"].apply(authors_to_string)
     df["Text"]=df["Text"].apply(clean_text)
     vect.fit(df["Text"])
-    print(f"There are f{len(vect.vocabulary_)} important words in the documents used for recommendation")
+    print(f"There are {len(vect.vocabulary_)} important words in the documents used for recommendation")
+    print(df)
     Word_bag=vect.transform(df["Text"])
     print("Word bag gotten!!!")
     system=cosine_similarity(Word_bag,Word_bag)
-    print("cosine similarit matrix gotten!!!")
+    print("cosine similarity matrix gotten!!!")
     np.save("utils/cosine_similarity",system)
     print(f"The shape of the cosine similarity matrix {system.shape}")
-    indices = pd.Series(df['_id'])
-    indices.to_csv("utils/indices.csv")
-    #Test model using the prices
-    indices_test = pd.Series(df['title'])
-    Title=indices.iloc[index]
+    indices_id = pd.Series(df['_id'])
+    indices_id.to_csv("utils/indices.csv")
+
+
+    #This is just to test the model using the prices
+    indices= pd.Series(df['title'])
+    test_index=35#which ranges from 0 to the number of documents in the database-1. Just for testing the model
+    print(indices)
+    Title=indices.iloc[test_index]
     print(Title)
-    recommended_texts=recommend(Title,system)
+    recommended_texts=test_recommend(Title,system,indices)
     print(recommended_texts)
     df_info=df_uncleaned[df_uncleaned["title"].isin(recommended_texts)][["_id","authors","title","abstract"]]
     print(df_info)
+    print("\n\n")
     print(df_info.authors)
+    print("\n")
+    end=time.time()
+    print(f"Runtime for the program is {end-start}")
+
 
 
