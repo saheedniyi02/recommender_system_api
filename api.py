@@ -30,11 +30,13 @@ print(indices.iloc[55])
 print(recommend(indices.iloc[55]))
 
 def get_recommendations(_id):
-    recommended_texts=recommend(_id)
-    recommendations_dict={}
-    for i in range(len(recommended_texts)):
-        recommendations_dict[i]=recommended_texts[i]
-    return recommendations_dict
+    recommended_texts_id=recommend(_id)
+    recommendations_list_of_dict=[]
+    dict_first={"0":recommended_texts_id[0]}
+    dict_second={"1":recommended_texts_id[1]}
+    recommendations_list_of_dict.append(dict_first)
+    recommendations_list_of_dict.append(dict_second)
+    return recommendations_list_of_dict
 
 
 print(get_recommendations(indices.iloc[70]))
@@ -44,12 +46,9 @@ app=Flask(__name__)
 
 @app.route("/recommendations/<_id>",methods=["GET"])
 def api(_id):
-    recommendations=[]
     print(_id)
-    recommendations_dict=get_recommendations(_id)
-    for i,_id in recommendations_dict.items():
-        recommendations.append({i:_id})
-    return jsonify(json.dumps(recommendations))
+    recommendations=get_recommendations(_id)
+    return jsonify({"data":recommendations,"message":f"recommendations successfully gotten for {_id}"})
 
 
 if __name__ == '__main__':
