@@ -60,7 +60,6 @@ def load_model():
     df["Text"]=df["Text"].apply(clean_text)
     vect.fit(df["Text"])
     print(f"There are {len(vect.vocabulary_)} important words in the documents used for recommendation")
-    print(df)
     Word_bag=vect.transform(df["Text"])
     print("Word bag gotten!!!")
     system=cosine_similarity(Word_bag,Word_bag)
