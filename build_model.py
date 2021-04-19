@@ -45,12 +45,6 @@ def clean_text(text):
     new_text=" ".join(new_text)
     return new_text
 
-def test_recommend(title, cosine_sim,indices):
-    idx = indices[indices == title].index[0]
-    score_series = pd.Series(cosine_sim[idx]).sort_values(ascending = False)
-    top_2_indices = list(score_series.iloc[1:3].index)
-
-    return [list(indices)[i] for i in top_2_indices]
 
 vect=TfidfVectorizer(stop_words="english")
 
@@ -75,21 +69,7 @@ def load_model():
     print(f"The shape of the cosine similarity matrix {system.shape}")
     indices_id = pd.Series(df['_id'])
     indices_id.to_csv("utils/indices.csv")
-
-
-    #This is just to test the model using the prices
-    indices= pd.Series(df['title'])
-    test_index=35#which ranges from 0 to the number of documents in the database-1. Just for testing the model
-    print(indices)
-    Title=indices.iloc[test_index]
-    print(Title)
-    recommended_texts=test_recommend(Title,system,indices)
-    print(recommended_texts)
-    df_info=df_uncleaned[df_uncleaned["title"].isin(recommended_texts)][["_id","authors","title","abstract"]]
-    print(df_info)
-    print("\n\n")
-    print(df_info.authors)
-    print("\n")
+    print("Cosine similarity matrix gotten and saved!!!")
     end=time.time()
     print(f"Runtime for the program is {end-start}")
 
