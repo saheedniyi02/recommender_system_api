@@ -24,10 +24,8 @@ def load_data(pymongo_link):
 def clean_authors(list_of_authors):
     new_list=[]
     for author in list_of_authors:
-      print(author)
       author=author.replace(".","").replace(",","").replace("(","").replace(")","").replace(" ","")
       author=author.lower()
-      print(author)
       new_list.append(author)
     return new_list
 
