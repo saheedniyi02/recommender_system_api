@@ -23,18 +23,16 @@ def load_data(pymongo_link):
 
 def clean_authors(list_of_authors):
     new_list=[]
-    special_char=[".","(",")"," "]
     for author in list_of_authors:
-        for char in special_char:
-            author=author.replace(char,"")
-        author=author.lower()
-        new_list.append(author)
+      print(author)
+      author=author.replace(".","").replace(",","").replace("(","").replace(")","").replace(" ","")
+      author=author.lower()
+      print(author)
+      new_list.append(author)
     return new_list
 
 def clean_abstract(abstract):
-   special_char=["\n","\r"]
-   for char in special_char:
-       abstract=abstract.replace(char,"")
+   abstract=abstract.replace("\n","").replace("\r","")
    abstract=abstract.lower()
    return abstract
 
