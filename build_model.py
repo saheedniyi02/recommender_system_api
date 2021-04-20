@@ -46,7 +46,7 @@ def clean_text(text):
     return new_text
 
 
-vect=TfidfVectorizer(stop_words="english")
+vect=TfidfVectorizer(stop_words="english",min_df=2)
 
 
 def load_model():
