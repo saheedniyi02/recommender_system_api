@@ -2,11 +2,12 @@
 from __future__ import unicode_literals
 from flask import Flask, jsonify, redirect
 from flask.json import load
+
 import pandas as pd, numpy as np, os
 from build_model import load_model
 from dotenv import load_dotenv
 from pymongo import MongoClient
-
+from flask_cors import CORS
 client = MongoClient(os.getenv('MONGODB_CONNECTION_STRING'))
 
 load_dotenv()
@@ -44,6 +45,7 @@ def get_col_from_id(_id):
         return
 
 app=Flask(__name__)
+CORS(app)
 
 @app.route('/')
 def home():
