@@ -1,18 +1,17 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 #import libraries
-import pymongo
 from pymongo import MongoClient
-import pandas as pd
-#import dns
-import numpy as np
-from sklearn.feature_extraction.text import CountVectorizer,TfidfVectorizer
+from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 from nltk import WordNetLemmatizer
-from nltk.tokenize import word_tokenize
-import nltk
+import nltk, time, numpy as np, pandas as pd, os
+from dotenv import load_dotenv
 import time
 import pickle
+from dotenv import load_dotenv
+
+load_dotenv()
 
 #download important nltk requirements
 nltk.download("wordnet")
@@ -75,7 +74,7 @@ vect_tags=TfidfVectorizer(stop_words="english",min_df=2)
 
 def load_model():
     start=time.time()
-    df=load_data("mongodb+srv://Tabby:1234@cluster0.c2f7n.mongodb.net/test")
+    df=load_data(os.getenv('MONGODB_CONNECTION_STRING'))
     df_uncleaned=df.copy()
     print(f"There are {df.shape[0]} documents in the database")
     df["authors"]=df["authors"].apply(clean_authors)
