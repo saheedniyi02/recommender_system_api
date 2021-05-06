@@ -125,7 +125,7 @@ def api_tags(_id):
         return jsonify({"keywords":list(keywords.keys()),
             "message":f"recommendations gotten successfully for id:{_id}"}),200
     except:
-        return jsonify({"message":"keywords could not be gotten for id:{_id}"}),404
+        return jsonify({"message":f"keywords could not be gotten for id:{_id}"}),404
 
 
 if __name__ == '__main__':
