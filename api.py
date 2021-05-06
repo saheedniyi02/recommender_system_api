@@ -90,7 +90,7 @@ def home():
     return redirect('https://documenter.getpostman.com/view/11853513/TzJsfJSw')
 
 @app.route("/recommendations/<_id>",methods=["GET"])
-def api(_id):
+def api_recommendations(_id):
     try:
         publication_data = get_col_from_id(_id)
         if not publication_data:
@@ -123,7 +123,7 @@ def api_tags(_id):
         feature_names=get_feature_names()
         keywords=extract_topn_from_vector(feature_names,sorted_items,5)
         return jsonify({"keywords":list(keywords.keys()),
-            "message":f"recommendations gotten successfully for id:{_id}"}),200
+            "message":f"keywords gotten successfully for id:{_id}"}),200
     except:
         return jsonify({"message":f"keywords could not be gotten for id:{_id}"}),404
 
