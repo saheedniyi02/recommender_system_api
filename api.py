@@ -8,12 +8,15 @@ from build_model import load_model
 from dotenv import load_dotenv
 from pymongo import MongoClient
 from flask_cors import CORS
+import pickle
 client = MongoClient(os.getenv('MONGODB_CONNECTION_STRING'))
 
 load_dotenv()
-
 system=np.load("utils/cosine_similarity.npy")
-indices=pd.read_csv("utils/indices.csv")["_id"]
+data=pd.read_csv("utils/indices_texts.csv")
+indices=data["_id"]
+text_without_authors=data[["_id","Text_without_authors"]].set_index("_id")
+vect_tags = pickle.load(open('utils/vect_tags.pkl','rb'))
 
 
 def recommend(_id, cosine_sim = system):
@@ -43,6 +46,41 @@ def get_col_from_id(_id):
     except Exception as e: 
         print(str(e))
         return
+    
+#Functions to get word tags
+def get_feature_names():
+    return vect_tags.get_feature_names()
+
+def get_text(_id):
+    return text_without_authors.loc[_id]["Text_without_authors"]
+
+def sort_coo(coo_matrix):
+    tuples = zip(coo_matrix.col, coo_matrix.data)
+    return sorted(tuples, key=lambda x: (x[1], x[0]), reverse=True)
+
+def extract_topn_from_vector(feature_names, sorted_items, topn=5):
+    """get the feature names and tf-idf score of top n items"""
+
+    #use only topn items from vector
+    sorted_items = sorted_items[:topn]
+
+    score_vals = []
+    feature_vals = []
+
+    # word index and corresponding tf-idf score
+    for idx, score in sorted_items:
+
+        #keep track of feature name and its corresponding score
+        score_vals.append(round(score, 3))
+        feature_vals.append(feature_names[idx])
+
+    #create a tuples of feature,score
+    #results = zip(feature_vals,score_vals)
+    results= {}
+    for idx in range(len(feature_vals)):
+        results[feature_vals[idx]]=score_vals[idx]
+
+    return results
 
 app=Flask(__name__)
 CORS(app)
@@ -76,6 +114,19 @@ def api(_id):
 def update_system():
     load_model()
     return "",204
+
+@app.route("/get_tags/<_id>",methods=["GET"])
+def api_tags(_id):
+    try:
+        tf_idf_vector=vect_tags.transform([get_text(_id)])
+        sorted_items=sort_coo(tf_idf_vector.tocoo())
+        feature_names=get_feature_names()
+        keywords=extract_topn_from_vector(feature_names,sorted_items,5)
+        return jsonify({"keywords":list(keywords.keys()),
+            "message":f"recommendations gotten successfully for id:{_id}"}),200
+    except:
+        return jsonify({"message":"keywords could not be gotten for id:{_id}"}),404
+
 
 if __name__ == '__main__':
     app.run()
